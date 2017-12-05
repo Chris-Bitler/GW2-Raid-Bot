@@ -9,6 +9,10 @@ import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import javax.security.auth.login.LoginException;
 import java.io.*;
 
+/**
+ * Start the program, read the token, and start the bot
+ * @author Christopher Bitler
+ */
 public class Main {
     public static void main(String[] args) throws LoginException, InterruptedException, RateLimitedException {
         String token = null;
@@ -23,6 +27,11 @@ public class Main {
         RaidBot bot = new RaidBot(jda);
     }
 
+    /**
+     * Read the token from the token file
+     * @return The token text
+     * @throws IOException
+     */
     private static String readToken() throws IOException {
         BufferedReader br = new BufferedReader(
                 new FileReader(new File("token")));

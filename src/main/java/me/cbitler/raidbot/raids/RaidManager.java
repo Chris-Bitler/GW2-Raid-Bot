@@ -7,28 +7,42 @@ import me.cbitler.raidbot.utility.Reactions;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 
+import javax.imageio.stream.IIOByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Serves as a manager for all of the raids. This includes creating, loading, and deleting raids
+ * @author Christopher Bitler
+ */
 public class RaidManager {
 
     static List<Raid> raids = new ArrayList<>();
+
+    /**
+     * Create a raid. This turns a PendingRaid object into a Raid object and inserts it into the list of raids.
+     * It also sends the associated embedded message and adds the reactions for people to join to the embed
+     * @param raid The pending raid to create
+     */
     public static void createRaid(PendingRaid raid) {
         MessageEmbed message = buildEmbed(raid);
 
         Guild guild = RaidBot.getInstance().getServer(raid.getServerId());
         List<TextChannel> channels = guild.getTextChannelsByName(raid.getAnnouncementChannel(), true);
         if(channels.size() > 0) {
+            // We always go with the first channel if there is more than one
             channels.get(0).sendMessage(message).queue(message1 -> {
                 boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                 if (inserted) {
-                    Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getName(), raid.getDate(), raid.getTime());
+                    Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDate(), raid.getTime());
                     newRaid.roles.addAll(raid.rolesWithNumbers);
                     raids.add(newRaid);
                     List<String> emojis = Reactions.getEmojis();
                     List<Emote> emotes = message1.getGuild().getEmotes();
                     for(Emote s : emotes) {
+                        // Discord is weird about emojis, so this seemed like the best way
+                        // after hitting a bunch of errors
                         if(emojis.contains(s.getName()) || s.getName().equalsIgnoreCase("X_")) {
                             message1.addReaction(s).queue();
                         }
@@ -40,6 +54,14 @@ public class RaidManager {
         }
     }
 
+    /**
+     * Insert a raid into the database
+     * @param raid The raid to insert
+     * @param messageId The embedded message / 'raidId'
+     * @param serverId The serverId related to this raid
+     * @param channelId The channelId for the announcement of this raid
+     * @return True if inserted, false otherwise
+     */
     private static boolean insertToDatabase(PendingRaid raid, String messageId, String serverId, String channelId) {
         RaidBot bot = RaidBot.getInstance();
         Database db = bot.getDatabase();
@@ -47,10 +69,11 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `name`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?)", new String[] {
                     messageId,
                     serverId,
                     channelId,
+                    raid.getLeaderName(),
                     raid.getName(),
                     raid.getDate(),
                     raid.getTime(),
@@ -63,6 +86,12 @@ public class RaidManager {
         return true;
     }
 
+    /**
+     * Load raids
+     * This first queries all of the raids and loads the raid data and adds the raids to the raid list
+     * Then, it queries the raid users and inserts them into their relevant raids, updating the embedded messages
+     * Finally, it queries the raid users' flex roles and inserts those to the raids
+     */
     public static void loadRaids() {
         RaidBot bot = RaidBot.getInstance();
         Database db = bot.getDatabase();
@@ -78,7 +107,12 @@ public class RaidManager {
                 String serverId = results.getResults().getString("serverId");
                 String channelId = results.getResults().getString("channelId");
 
-                Raid raid = new Raid(messageId, serverId, channelId, name, date, time);
+                String leaderName = null;
+                try {
+                    leaderName = results.getResults().getString("leader");
+                } catch (Exception e) { }
+
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, date, time);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
@@ -105,6 +139,21 @@ public class RaidManager {
                     raid.addUser(id, name, spec, role, false);
                 }
             }
+
+            QueryResult userFlexRolesResults = db.query("SELECT * FROM `raidUsersFlexroles`", new String[] {});
+
+            while(userFlexRolesResults.getResults().next()) {
+                String id = userFlexRolesResults.getResults().getString("userId");
+                String name = userFlexRolesResults.getResults().getString("username");
+                String spec = userFlexRolesResults.getResults().getString("spec");
+                String role = userFlexRolesResults.getResults().getString("role");
+                String raidId = userFlexRolesResults.getResults().getString("raidId");
+
+                Raid raid = RaidManager.getRaid(raidId);
+                if(raid != null) {
+                    raid.addUserFlexRole(id, name, spec, role, false);
+                }
+            }
         } catch (SQLException e) {
             System.out.println("Couldn't load raids.. exiting");
             e.printStackTrace();
@@ -112,6 +161,11 @@ public class RaidManager {
         }
     }
 
+    /**
+     * Get a raid from the discord message ID
+     * @param messageId The discord message ID associated with the raid's embedded message
+     * @return The raid object related to that messageId, if it exist.
+     */
     public static Raid getRaid(String messageId)
     {
         for(Raid raid : raids) {
@@ -121,6 +175,13 @@ public class RaidManager {
         }
         return null;
     }
+
+    /**
+     * Formats the roles associated with a raid in a form that can be inserted into a database row.
+     * This combines them as [number]:[name];[number]:[name];...
+     * @param rolesWithNumbers The roles and their amounts
+     * @return The formatted string
+     */
     private static String formatRolesForDatabase(List<RaidRole> rolesWithNumbers) {
         String data = "";
 
@@ -136,21 +197,47 @@ public class RaidManager {
         return data;
     }
 
+    /**
+     * Create a message embed to show the raid
+     * @param raid The raid object
+     * @return The embedded message
+     */
     private static MessageEmbed buildEmbed(PendingRaid raid) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(raid.getName());
+        builder.addBlankField(false);
+        if (raid.getLeaderName() != null) {
+            builder.addField("Leader: ", "**" + raid.getLeaderName() + "**", false);
+        }
+        builder.addBlankField(false);
         builder.addField("Date: ", raid.getDate(), true);
         builder.addField("Time: ", raid.getTime(), true);
-        builder.addField("Roles:", buildRolesText(raid), false);
+        builder.addBlankField(false);
+        builder.addField("Roles: ", buildRolesText(raid), true);
+        builder.addField("Flex Roles: ", buildFlexRolesText(raid), true);
         builder.addBlankField(false);
         return builder.build();
     }
 
+    /**
+     * Builds the text to go into the roles field in the embedded message
+     * @param raid The raid object
+     * @return The role text
+     */
     private static String buildRolesText(PendingRaid raid) {
         String text = "";
         for(RaidRole role : raid.getRolesWithNumbers()) {
             text += ("**" + role.name + " (" + role.amount + "):** \n");
         }
         return text;
+    }
+
+    /**
+     * Build the flex role text. This is blank here as we have no flex roles at this point.
+     * @param raid
+     * @return The flex roles text (blank here)
+     */
+    private static String buildFlexRolesText(PendingRaid raid) {
+        return "";
     }
 }

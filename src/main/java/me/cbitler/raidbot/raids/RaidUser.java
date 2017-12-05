@@ -1,5 +1,10 @@
 package me.cbitler.raidbot.raids;
 
+/**
+ * Represents a raid user
+ * This class is not commented as the method names should be self-explanatory
+ * @author Christopher Bitler
+ */
 public class RaidUser {
     String id;
     String name;

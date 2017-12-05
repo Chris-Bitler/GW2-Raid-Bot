@@ -1,48 +1,46 @@
 package me.cbitler.raidbot.selection;
 
 import me.cbitler.raidbot.raids.Raid;
-import me.cbitler.raidbot.raids.RaidUser;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
- * Step for picking a role for a raid
- * @author Christopher Bitler
+ * Step for a user picking a flex role for a raid
  */
-public class PickRoleStep implements SelectionStep {
+public class PickFlexRoleStep implements SelectionStep {
     Raid raid;
     String spec;
 
     /**
-     * Create a new step for this role selection with the specified raid and spec
+     * Create a new step for this flex role selection with the specified raid and spec
      * that the user chose
      * @param raid The raid
      * @param spec The specialization that the user chose
      */
-    public PickRoleStep(Raid raid, String spec) {
+    public PickFlexRoleStep(Raid raid, String spec) {
         this.raid = raid;
         this.spec = spec;
     }
 
     /**
      * Handle the user input - checks to see if the role they are picking is valid
-     * and not full, and if so, adding them to that role
+     * and if so, adding them to that flex role
      * @param e The private message event
-     * @return True if the user chose a valid, not full, role, false otherwise
+     * @return True if the user chose a valid role, false otherwise
      */
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
-        if(raid.isValidNotFullRole(e.getMessage().getRawContent())) {
-            raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true);
-            e.getChannel().sendMessage("Added to raid roster").queue();
+        if(raid.isValidRole(e.getMessage().getRawContent())) {
+            raid.addUserFlexRole(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true);
+            e.getChannel().sendMessage("Added to raid roster as flex role.").queue();
             return true;
         } else {
-            e.getChannel().sendMessage("Please choose a valid role that is not full.").queue();
+            e.getChannel().sendMessage("Please choose a valid flex role.").queue();
             return false;
         }
     }
 
     /**
-     * Get the next step - no next step here as this is a one step process
+     * Get the next step - null here as this is a one-step process
      * @return null
      */
     @Override
@@ -56,7 +54,7 @@ public class PickRoleStep implements SelectionStep {
      */
     @Override
     public String getStepText() {
-        String text = "Pick a role (";
+        String text = "Pick a flex role (";
         for (int i = 0; i < raid.getRoles().size(); i++) {
             if (i == raid.getRoles().size()-1) {
                 text += raid.getRoles().get(i).getName();

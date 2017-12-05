@@ -7,12 +7,21 @@ import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
+/**
+ * Handle channel message-related events sent to the bot
+ * @author Christopher Bitler
+ */
 public class ChannelMessageHandler extends ListenerAdapter {
 
+    /**
+     * Handle receiving a message. This checks to see if it matches the !createRaid or !removeFromRaid commands
+     * and acts on them accordingly.
+     *
+     * @param e The event
+     */
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
         RaidBot bot = RaidBot.getInstance();
@@ -48,6 +57,11 @@ public class ChannelMessageHandler extends ListenerAdapter {
         }
     }
 
+    /**
+     * Check to see if a member has the raid leader role
+     * @param member The member to check
+     * @return True if they have the role, false if they don't
+     */
     private boolean hasRaidLeaderRole(Member member) {
         for (Role role : member.getRoles()) {
             if (role.getName().equalsIgnoreCase(RaidBot.RAID_LEADER_ROLE_TEXT)) {

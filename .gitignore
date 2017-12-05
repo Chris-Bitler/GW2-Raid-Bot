@@ -3,3 +3,4 @@ target/*
 *.iml
 *.db
 token
+dependency-reduced-pom.xml

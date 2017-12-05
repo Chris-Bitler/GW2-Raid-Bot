@@ -5,8 +5,19 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidRole;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
+/**
+ * Role setup step for the raid.
+ * This one should take multiple inputs and as a result it doesn't finish until the user
+ * types 'done'.
+ * @author Christopher Bitler
+ */
 public class RunRoleSetupStep implements CreationStep {
 
+    /**
+     * Handle user input - should be in the format [number]:[role] unless it is 'done'.
+     * @param e The direct message event
+     * @return True if the user entered 'done', false otherwise
+     */
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
@@ -27,10 +38,16 @@ public class RunRoleSetupStep implements CreationStep {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getStepText() {
         return "Enter the roles for raid run (format: [amount]:[Role name]). Type done to finish entering roles:";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public CreationStep getNextStep() {
         return null;
     }

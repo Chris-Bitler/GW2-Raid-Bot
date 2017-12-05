@@ -3,8 +3,13 @@ package me.cbitler.raidbot.raids;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class to store data about a raid that is being set up
+ * This isn't commented as the method names should be self-explanatory
+ * @author Christopher Bitler
+ */
 public class PendingRaid {
-    String name, date, time, announcementChannel, serverId;
+    String name, date, time, announcementChannel, serverId, leaderName;
     List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
 
     public String getName() {
@@ -45,6 +50,14 @@ public class PendingRaid {
 
     public void setServerId(String serverId) {
         this.serverId = serverId;
+    }
+
+    public String getLeaderName() {
+        return leaderName;
+    }
+
+    public void setLeaderName(String leaderName) {
+        this.leaderName = leaderName;
     }
 
     public List<RaidRole> getRolesWithNumbers() {

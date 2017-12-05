@@ -4,22 +4,32 @@ import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
-import me.cbitler.raidbot.selection.PickRoleStep;
 import me.cbitler.raidbot.selection.SelectionStep;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import java.util.function.Consumer;
-
+/**
+ * Handle direct messages sent to the bot
+ * @author Christopher Bitler
+ */
 public class DMHandler extends ListenerAdapter {
     RaidBot bot;
 
+    /**
+     * Create a new direct message handler with the parent bot
+     * @param bot The parent bot
+     */
     public DMHandler(RaidBot bot) {
         this.bot = bot;
     }
 
+    /**
+     * Handle receiving a private message.
+     * This checks to see if the user is currently going through the raid creation process or
+     * the role selection process and acts accordingly.
+     * @param e The private message event
+     */
     @Override
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent e) {
         User author = e.getAuthor();
@@ -27,6 +37,8 @@ public class DMHandler extends ListenerAdapter {
         if (bot.getCreationMap().containsKey(author.getId())) {
             CreationStep step = bot.getCreationMap().get(author.getId());
             boolean done = step.handleDM(e);
+
+            // If this step is done, move onto the next one or finish
             if (done) {
                 CreationStep nextStep = step.getNextStep();
                 if(nextStep != null) {
@@ -43,6 +55,8 @@ public class DMHandler extends ListenerAdapter {
         } else if (bot.getRoleSelectionMap().containsKey(author.getId())) {
             SelectionStep step = bot.getRoleSelectionMap().get(author.getId());
             boolean done = step.handleDM(e);
+
+            //If this step is done, move onto the next one or finish
             if(done) {
                 SelectionStep nextStep = step.getNextStep();
                 if(nextStep != null) {
