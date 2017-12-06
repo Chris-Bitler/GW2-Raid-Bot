@@ -32,7 +32,7 @@ public class PickRoleStep implements SelectionStep {
     @Override
     public boolean handleDM(PrivateMessageReceivedEvent e) {
         if(raid.isValidNotFullRole(e.getMessage().getRawContent())) {
-            raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true);
+            raid.addUser(e.getAuthor().getId(), e.getAuthor().getName(), spec, e.getMessage().getRawContent(), true, true);
             e.getChannel().sendMessage("Added to raid roster").queue();
             return true;
         } else {

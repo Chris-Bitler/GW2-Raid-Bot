@@ -181,7 +181,7 @@ public class Raid {
      * @param db_insert Whether or not the user should be inserted. This is false when the roles are loaded from the database.
      * @return true if the user was added, false otherwise
      */
-    public boolean addUser(String id, String name, String spec, String role, boolean db_insert) {
+    public boolean addUser(String id, String name, String spec, String role, boolean db_insert, boolean update_message) {
         RaidUser user = new RaidUser(id, name, spec, role);
 
         if(db_insert) {
@@ -201,7 +201,10 @@ public class Raid {
 
         userToRole.put(user, role);
         usersToFlexRoles.computeIfAbsent(user, k -> new ArrayList<>());
-        updateMessage();
+
+        if(update_message) {
+            updateMessage();
+        }
         return true;
     }
 
@@ -216,7 +219,7 @@ public class Raid {
      * @param db_insert Whether or not the user should be inserted. This is false when the roles are loaded from the database.
      * @return true if the user was added, false otherwise
      */
-    public boolean addUserFlexRole(String id, String name, String spec, String role, boolean db_insert) {
+    public boolean addUserFlexRole(String id, String name, String spec, String role, boolean db_insert, boolean update_message) {
         RaidUser user = getUserByName(name);
         FlexRole frole = new FlexRole(spec, role);
 
@@ -235,8 +238,14 @@ public class Raid {
             }
         }
 
+        if(usersToFlexRoles.get(user) == null) {
+            usersToFlexRoles.put(user, new ArrayList<>());
+        }
+
         usersToFlexRoles.get(user).add(frole);
-        updateMessage();
+        if(update_message) {
+            updateMessage();
+        }
         return true;
     }
 
@@ -264,9 +273,8 @@ public class Raid {
             Map.Entry<RaidUser, String> user = users.next();
             if(user.getKey().getId().equalsIgnoreCase(id)) {
                 users.remove();
+                usersToFlexRoles.remove(user.getKey());
             }
-
-            usersToFlexRoles.remove(user.getKey());
         }
 
         try {
@@ -284,7 +292,7 @@ public class Raid {
     /**
      * Update the embedded message for the raid
      */
-    private void updateMessage() {
+    public void updateMessage() {
         MessageEmbed embed = buildEmbed();
         try {
             RaidBot.getInstance().getServer(getServerId()).getTextChannelById(getChannelId())

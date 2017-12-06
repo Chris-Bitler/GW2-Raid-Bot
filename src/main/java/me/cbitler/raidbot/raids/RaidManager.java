@@ -32,28 +32,25 @@ public class RaidManager {
         List<TextChannel> channels = guild.getTextChannelsByName(raid.getAnnouncementChannel(), true);
         if(channels.size() > 0) {
             // We always go with the first channel if there is more than one
-            channels.get(0).sendMessage(message).queue(message1 -> {
-                boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
-                if (inserted) {
-                    Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDate(), raid.getTime());
-                    newRaid.roles.addAll(raid.rolesWithNumbers);
-                    raids.add(newRaid);
-                    /*List<String> emojis = Reactions.getEmojis();
-                    List<Emote> emotes = message1.getGuild().getEmotes();
-                    for(Emote s : emotes) {
-                        // Discord is weird about emojis, so this seemed like the best way
-                        // after hitting a bunch of errors
-                        if(emojis.contains(s.getName()) || s.getName().equalsIgnoreCase("X_")) {
-                            message1.addReaction(s).queue();
+            try {
+                channels.get(0).sendMessage(message).queue(message1 -> {
+                    boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
+                    if (inserted) {
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDate(), raid.getTime());
+                        newRaid.roles.addAll(raid.rolesWithNumbers);
+                        raids.add(newRaid);
+
+                        for (Emote emote : Reactions.getEmotes()) {
+                            message1.addReaction(emote).queue();
                         }
-                    }*/
-                    for(Emote emote : Reactions.getEmotes()) {
-                        message1.addReaction(emote).queue();
+                    } else {
+                        message1.delete().queue();
                     }
-                } else {
-                    message1.delete().queue();
-                }
-            });
+                });
+            } catch (Exception e) {
+                System.out.println("Error encountered in sending message.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -139,7 +136,7 @@ public class RaidManager {
 
                 Raid raid = RaidManager.getRaid(raidId);
                 if(raid != null) {
-                    raid.addUser(id, name, spec, role, false);
+                    raid.addUser(id, name, spec, role, false, false);
                 }
             }
 
@@ -154,8 +151,12 @@ public class RaidManager {
 
                 Raid raid = RaidManager.getRaid(raidId);
                 if(raid != null) {
-                    raid.addUserFlexRole(id, name, spec, role, false);
+                    raid.addUserFlexRole(id, name, spec, role, false, false);
                 }
+            }
+
+            for(Raid raid : raids) {
+                raid.updateMessage();
             }
         } catch (SQLException e) {
             System.out.println("Couldn't load raids.. exiting");
