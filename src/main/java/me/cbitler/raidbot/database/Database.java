@@ -37,6 +37,10 @@ public class Database {
             + " role text, \n"
             + " raidId text)";
 
+    String botServerSettingsInit = "CREATE TABLE IF NOT EXISTS serverSettings (\n"
+            + " serverId text PRIMARY KEY, \n"
+            + " raid_leader_role text)";
+
     /**
      * Create a new database with the specific filename
      * @param databaseName The filename/location of the SQLite database
@@ -112,6 +116,7 @@ public class Database {
         connection.createStatement().execute(raidTableInit);
         connection.createStatement().execute(raidUsersTableInit);
         connection.createStatement().execute(raidUsersFlexRolesTableInit);
+        connection.createStatement().execute(botServerSettingsInit);
 
         try {
             connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");

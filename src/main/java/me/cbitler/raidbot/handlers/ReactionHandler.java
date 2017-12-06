@@ -21,7 +21,7 @@ public class ReactionHandler extends ListenerAdapter {
             return;
         }
         if (raid != null) {
-            if (Reactions.getEmojis().contains(e.getReactionEmote().getEmote().getName())) {
+            if (Reactions.getSpecs().contains(e.getReactionEmote().getEmote().getName())) {
                 RaidBot bot = RaidBot.getInstance();
                 if(!raid.isUserInRaid(e.getUser().getId())) {
                     if (bot.getRoleSelectionMap().get(e.getUser().getId()) == null) {

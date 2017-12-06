@@ -2,6 +2,7 @@ package me.cbitler.raidbot;
 
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.database.Database;
+import me.cbitler.raidbot.database.QueryResult;
 import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
@@ -12,6 +13,7 @@ import me.cbitler.raidbot.selection.SelectionStep;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -23,14 +25,15 @@ import java.util.HashMap;
  * @author Christopher Bitler
  */
 public class RaidBot {
-    public static final String RAID_LEADER_ROLE_TEXT = "Raid Leader";
-
     private static RaidBot instance;
     private JDA jda;
 
     HashMap<String, CreationStep> creation = new HashMap<String, CreationStep>();
     HashMap<String, PendingRaid> pendingRaids = new HashMap<String, PendingRaid>();
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
+
+    //TODO: This should be moved to it's own settings thing
+    HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
 
     Database db;
 
@@ -82,11 +85,65 @@ public class RaidBot {
     }
 
     /**
+     * Exposes the underlying library. This is mainly necessary for getting Emojis
+     * @return The JDA library object
+     */
+    public JDA getJda() {
+        return jda;
+    }
+
+    /**
      * Get the database that the bot is using
      * @return The database that the bot is using
      */
     public Database getDatabase() {
         return db;
+    }
+
+    /**
+     * Get the raid leader role for a specific server.
+     * This works by caching the role once it's retrieved once, and returning the default if a server hasn't set one.
+     * @param serverId the ID of the server
+     * @return The name of the role that is considered the raid leader for that server
+     */
+    public String getRaidLeaderRole(String serverId) {
+        if (raidLeaderRoleCache.get(serverId) != null) {
+            return raidLeaderRoleCache.get(serverId);
+        } else {
+            try {
+                QueryResult results = db.query("SELECT `raid_leader_role` FROM `serverSettings` WHERE `serverId` = ?",
+                        new String[]{serverId});
+                if (results.getResults().next()) {
+                    raidLeaderRoleCache.put(serverId, results.getResults().getString("raid_leader_role"));
+                    return raidLeaderRoleCache.get(serverId);
+                } else {
+                    return "Raid Leader";
+                }
+            } catch (Exception e) {
+                return "Raid Leader";
+            }
+        }
+    }
+
+    /**
+     * Set the raid leader role for a server. This also updates it in SQLite
+     * @param serverId The server ID
+     * @param role The role name
+     */
+    public void setRaidLeaderRole(String serverId, String role) {
+        raidLeaderRoleCache.put(serverId, role);
+        try {
+            db.update("INSERT INTO `serverSettings` (`serverId`,`raid_leader_role`) VALUES (?,?)",
+                    new String[] { serverId, role});
+        } catch (SQLException e) {
+            //TODO: There is probably a much better way of doing this
+            try {
+                db.update("UPDATE `serverSettings` SET `raid_leader_role` = ? WHERE `serverId` = ?",
+                        new String[] { role, serverId });
+            } catch (SQLException e1) {
+                // Not much we can do if there is also an insert error
+            }
+        }
     }
 
     /**

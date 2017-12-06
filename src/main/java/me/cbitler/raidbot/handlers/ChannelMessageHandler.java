@@ -5,6 +5,7 @@ import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -28,6 +29,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
         if (e.getAuthor().isBot()) {
            return;
         }
+
         if (hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createRaid")) {
                 CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
@@ -44,7 +46,7 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
                     Raid raid = RaidManager.getRaid(messageId);
 
-                    if (raid != null) {
+                    if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
                         if(raid.getUserByName(name) != null) {
                             raid.removeUserByName(name);
                         }
@@ -52,6 +54,16 @@ public class ChannelMessageHandler extends ListenerAdapter {
                         e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant raid").queue());
                     }
                 }
+                e.getMessage().delete().queue();
+            }
+        }
+
+        if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
+            if(e.getMessage().getRawContent().toLowerCase().startsWith("!setraidleaderrole")) {
+                String[] commandParts = e.getMessage().getRawContent().split(" ");
+                String raidLeaderRole = combineArguments(commandParts,1);
+                RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
+                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid leader role updated to: " + raidLeaderRole).queue());
                 e.getMessage().delete().queue();
             }
         }
@@ -63,11 +75,27 @@ public class ChannelMessageHandler extends ListenerAdapter {
      * @return True if they have the role, false if they don't
      */
     private boolean hasRaidLeaderRole(Member member) {
+        String raidLeaderRole = RaidBot.getInstance().getRaidLeaderRole(member.getGuild().getId());
         for (Role role : member.getRoles()) {
-            if (role.getName().equalsIgnoreCase(RaidBot.RAID_LEADER_ROLE_TEXT)) {
+            if (role.getName().equalsIgnoreCase(raidLeaderRole)) {
                 return true;
             }
         }
-         return false;
+        return false;
+    }
+
+    /**
+     * Combine the strings in an array of strings
+     * @param parts The array of strings
+     * @param offset The offset in the array to start at
+     * @return The combined string
+     */
+    private String combineArguments(String[] parts, int offset) {
+        String text = "";
+        for (int i = offset; i < parts.length; i++) {
+            text += (parts[i] + " ");
+        }
+
+        return text.trim();
     }
 }

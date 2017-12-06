@@ -38,7 +38,7 @@ public class RaidManager {
                     Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDate(), raid.getTime());
                     newRaid.roles.addAll(raid.rolesWithNumbers);
                     raids.add(newRaid);
-                    List<String> emojis = Reactions.getEmojis();
+                    /*List<String> emojis = Reactions.getEmojis();
                     List<Emote> emotes = message1.getGuild().getEmotes();
                     for(Emote s : emotes) {
                         // Discord is weird about emojis, so this seemed like the best way
@@ -46,6 +46,9 @@ public class RaidManager {
                         if(emojis.contains(s.getName()) || s.getName().equalsIgnoreCase("X_")) {
                             message1.addReaction(s).queue();
                         }
+                    }*/
+                    for(Emote emote : Reactions.getEmotes()) {
+                        message1.addReaction(emote).queue();
                     }
                 } else {
                     message1.delete().queue();
