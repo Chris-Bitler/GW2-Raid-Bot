@@ -21,7 +21,7 @@ public class RunChannelStep implements CreationStep {
             return false;
         }
 
-        raid.setAnnouncementChannel(e.getMessage().getRawContent());
+        raid.setAnnouncementChannel(e.getMessage().getRawContent().replace("#",""));
 
         return true;
     }

@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.entities.*;
 import javax.imageio.stream.IIOByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -50,6 +51,7 @@ public class RaidManager {
             } catch (Exception e) {
                 System.out.println("Error encountered in sending message.");
                 e.printStackTrace();
+                throw e;
             }
         }
     }
@@ -163,6 +165,35 @@ public class RaidManager {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    public static boolean deleteRaid(String messageId) {
+        if (getRaid(messageId) != null) {
+            Iterator<Raid> raidIterator = raids.iterator();
+            while (raidIterator.hasNext()) {
+                Raid raid = raidIterator.next();
+                if (raid.getMessageId().equalsIgnoreCase(messageId)) {
+                    raidIterator.remove();
+                }
+            }
+
+            try {
+                RaidBot.getInstance().getDatabase().update("DELETE FROM `raids` WHERE `raidId` = ?", new String[]{
+                        messageId
+                });
+                RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsers` WHERE `raidId` = ?", new String[]{
+                        messageId
+                });
+                RaidBot.getInstance().getDatabase().update("DELETE FROM `raidUsersFlexRoles` WHERE `raidId` = ?",
+                        new String[]{messageId});
+            } catch (Exception e) {
+                System.out.println("Error encountered deleting raid");
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

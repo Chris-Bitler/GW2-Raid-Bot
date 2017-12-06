@@ -62,7 +62,7 @@ public class PickFlexRoleStep implements SelectionStep {
                 text += (raid.getRoles().get(i).getName() + ", ");
             }
         }
-        text += ")";
+        text += ") or type cancel to cancel role selection.";
 
         return text;
     }

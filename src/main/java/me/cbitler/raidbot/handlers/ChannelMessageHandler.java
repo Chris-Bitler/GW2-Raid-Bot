@@ -8,6 +8,7 @@ import me.cbitler.raidbot.raids.RaidManager;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -66,6 +67,13 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid leader role updated to: " + raidLeaderRole).queue());
                 e.getMessage().delete().queue();
             }
+        }
+    }
+
+    @Override
+    public void onGuildMessageDelete(GuildMessageDeleteEvent e) {
+        if (RaidManager.getRaid(e.getMessageId()) != null) {
+            RaidManager.deleteRaid(e.getMessageId());
         }
     }
 

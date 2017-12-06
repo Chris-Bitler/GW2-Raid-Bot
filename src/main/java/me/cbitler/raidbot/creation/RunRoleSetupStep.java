@@ -23,7 +23,12 @@ public class RunRoleSetupStep implements CreationStep {
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
 
         if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
-            return true;
+            if(raid.getRolesWithNumbers().size() > 0) {
+                return true;
+            } else {
+                e.getChannel().sendMessage("You must add atleast one role.").queue();
+                return false;
+            }
         } else {
             String[] parts = e.getMessage().getRawContent().split(":");
             if(parts.length < 2) {
