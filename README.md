@@ -1,4 +1,6 @@
 # GW2 Raid Bot
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FChris-Bitler%2FGW2-Raid-Bot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FChris-Bitler%2FGW2-Raid-Bot?ref=badge_shield)
+
 This bot is meant to be used to help organize raid teams in discord servers for GuildWars 2.
 It attempts to create a streamlined user experience so that creating and joining raids are easy.
 
@@ -33,3 +35,5 @@ Finally, you can run the bot and invite it to your discord server and start usin
 
 ## License
 GPLv3
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FChris-Bitler%2FGW2-Raid-Bot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FChris-Bitler%2FGW2-Raid-Bot?ref=badge_large)
