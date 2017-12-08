@@ -1,6 +1,8 @@
 package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
+import me.cbitler.raidbot.commands.Command;
+import me.cbitler.raidbot.commands.CommandRegistry;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
 import me.cbitler.raidbot.raids.Raid;
@@ -29,6 +31,13 @@ public class ChannelMessageHandler extends ListenerAdapter {
         RaidBot bot = RaidBot.getInstance();
         if (e.getAuthor().isBot()) {
            return;
+        }
+
+        if(e.getMessage().getRawContent().startsWith("!")) {
+            String[] messageParts = e.getMessage().getRawContent().split(" ");
+            String[] arguments = CommandRegistry.getArguments(messageParts);
+            Command command = CommandRegistry.getCommand(messageParts[0].replace("!",""));
+            command.handleCommand(messageParts[0], arguments, e.getChannel(), e.getAuthor());
         }
 
         if (hasRaidLeaderRole(e.getMember())) {
