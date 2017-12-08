@@ -1,8 +1,6 @@
 package me.cbitler.raidbot;
 
-import me.cbitler.raidbot.commands.CommandRegistry;
-import me.cbitler.raidbot.commands.HelpCommand;
-import me.cbitler.raidbot.commands.InfoCommand;
+import me.cbitler.raidbot.commands.*;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
@@ -55,6 +53,7 @@ public class RaidBot {
 
         CommandRegistry.addCommand("help", new HelpCommand());
         CommandRegistry.addCommand("info", new InfoCommand());
+        CommandRegistry.addCommand("endRaid", new EndRaidCommand());
     }
 
     /**

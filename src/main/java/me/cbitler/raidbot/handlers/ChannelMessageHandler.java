@@ -7,6 +7,7 @@ import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
+import me.cbitler.raidbot.utility.PermissionsUtil;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
@@ -37,10 +38,13 @@ public class ChannelMessageHandler extends ListenerAdapter {
             String[] messageParts = e.getMessage().getRawContent().split(" ");
             String[] arguments = CommandRegistry.getArguments(messageParts);
             Command command = CommandRegistry.getCommand(messageParts[0].replace("!",""));
-            command.handleCommand(messageParts[0], arguments, e.getChannel(), e.getAuthor());
+            if(command != null) {
+                command.handleCommand(messageParts[0], arguments, e.getChannel(), e.getAuthor());
+                e.getMessage().delete().queue();
+            }
         }
 
-        if (hasRaidLeaderRole(e.getMember())) {
+        if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createRaid")) {
                 CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
                 e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
@@ -84,21 +88,6 @@ public class ChannelMessageHandler extends ListenerAdapter {
         if (RaidManager.getRaid(e.getMessageId()) != null) {
             RaidManager.deleteRaid(e.getMessageId());
         }
-    }
-
-    /**
-     * Check to see if a member has the raid leader role
-     * @param member The member to check
-     * @return True if they have the role, false if they don't
-     */
-    private boolean hasRaidLeaderRole(Member member) {
-        String raidLeaderRole = RaidBot.getInstance().getRaidLeaderRole(member.getGuild().getId());
-        for (Role role : member.getRoles()) {
-            if (role.getName().equalsIgnoreCase(raidLeaderRole)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

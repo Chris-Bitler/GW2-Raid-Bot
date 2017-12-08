@@ -290,6 +290,24 @@ public class Raid {
     }
 
     /**
+     * Send the dps report log links to the players in this raid
+     * @param logLinks The list of links
+     */
+    public void messagePlayersWithLogLinks(List<String> logLinks) {
+        String logLinkMessage = "ArcDPS reports from **" + this.getName() + "**:\n";
+        for(String link : logLinks) {
+            logLinkMessage += (link + "\n");
+        }
+
+        final String finalLogLinkMessage = logLinkMessage;
+        for(RaidUser user : this.userToRole.keySet()) {
+            RaidBot.getInstance().getServer(this.serverId).getMemberById(user.id).getUser().openPrivateChannel().queue(
+                    privateChannel -> privateChannel.sendMessage(finalLogLinkMessage).queue()
+            );
+        }
+    }
+
+    /**
      * Update the embedded message for the raid
      */
     public void updateMessage() {
