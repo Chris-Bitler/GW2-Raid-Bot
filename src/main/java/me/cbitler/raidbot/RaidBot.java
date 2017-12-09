@@ -11,9 +11,11 @@ import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
+import me.cbitler.raidbot.utility.GuildCountUtil;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -54,6 +56,21 @@ public class RaidBot {
         CommandRegistry.addCommand("help", new HelpCommand());
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endRaid", new EndRaidCommand());
+
+        new Thread(() -> {
+            while (true) {
+                try {
+                    GuildCountUtil.sendGuilds(jda);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    Thread.sleep(1000*60*5);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /**

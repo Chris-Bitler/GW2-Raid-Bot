@@ -4,3 +4,4 @@ target/*
 *.db
 token
 dependency-reduced-pom.xml
+discord_bots_token

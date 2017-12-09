@@ -40,7 +40,10 @@ public class ChannelMessageHandler extends ListenerAdapter {
             Command command = CommandRegistry.getCommand(messageParts[0].replace("!",""));
             if(command != null) {
                 command.handleCommand(messageParts[0], arguments, e.getChannel(), e.getAuthor());
-                e.getMessage().delete().queue();
+
+                try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
             }
         }
 
@@ -68,7 +71,9 @@ public class ChannelMessageHandler extends ListenerAdapter {
                         e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant raid").queue());
                     }
                 }
-                e.getMessage().delete().queue();
+                try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
             }
         }
 
