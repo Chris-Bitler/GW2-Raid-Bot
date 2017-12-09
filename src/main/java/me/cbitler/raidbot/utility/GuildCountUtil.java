@@ -37,6 +37,10 @@ public class GuildCountUtil {
         saveGuilds(jda);
     }
 
+    /**
+     * Save a list of the guilds using the bot to a file for easier debugging. This can easily be removed.
+     * @param jda
+     */
     private static void saveGuilds(JDA jda) {
         File file = new File("guilds");
         if(file.exists()) {
