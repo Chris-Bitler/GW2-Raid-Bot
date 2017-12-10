@@ -34,10 +34,14 @@ public class RunRoleSetupStep implements CreationStep {
             if(parts.length < 2) {
                 e.getChannel().sendMessage("You need to specify the role in the format [amount]:[Role name]").queue();
             } else {
-                int amnt = Integer.parseInt(parts[0]);
-                String roleName = parts[1];
-                raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
-                e.getChannel().sendMessage("Role added").queue();
+                try {
+                    int amnt = Integer.parseInt(parts[0]);
+                    String roleName = parts[1];
+                    raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
+                    e.getChannel().sendMessage("Role added").queue();
+                } catch (Exception ex) {
+                    e.getChannel().sendMessage("Invalid input: Make sure it's in the format of [number]:[role], like 1:DPS").queue();
+                }
             }
             return false;
         }
