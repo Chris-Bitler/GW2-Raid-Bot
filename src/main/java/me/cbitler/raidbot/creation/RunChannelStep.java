@@ -2,6 +2,7 @@ package me.cbitler.raidbot.creation;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.raids.PendingRaid;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
 
 /**
@@ -18,6 +19,19 @@ public class RunChannelStep implements CreationStep {
         RaidBot bot = RaidBot.getInstance();
         PendingRaid raid = bot.getPendingRaids().get(e.getAuthor().getId());
         if (raid == null) {
+            return false;
+        }
+
+        String channelWithoutHash = e.getMessage().getRawContent().replace("#","");
+        boolean validChannel = false;
+        for (TextChannel channel : bot.getServer(raid.getServerId()).getTextChannels()) {
+            if(channel.getName().replace("#","").equalsIgnoreCase(channelWithoutHash)) {
+                validChannel = true;
+            }
+        }
+
+        if(!validChannel) {
+            e.getChannel().sendMessage("Please choose a valid channel.").queue();
             return false;
         }
 
