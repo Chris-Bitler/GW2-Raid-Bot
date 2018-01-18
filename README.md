@@ -27,6 +27,9 @@ in the same directory as the jar file.
 
 Finally, you can run the bot and invite it to your discord server and start using it for raids!
 
+## Support Discord
+[Discord Server for support for issues with the bot](https://discord.gg/pWs8tDY)
+
 ## Credits
 - Christopher Bitler: Bot development
 - Tyler "Inverness": Bot idea
