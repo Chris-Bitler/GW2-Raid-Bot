@@ -9,7 +9,7 @@ import java.util.List;
  * @author Christopher Bitler
  */
 public class PendingRaid {
-    String name, date, time, announcementChannel, serverId, leaderName;
+    String name, description, date, time, announcementChannel, serverId, leaderName;
     List<RaidRole> rolesWithNumbers = new ArrayList<RaidRole>();
 
     public String getName() {
@@ -62,5 +62,13 @@ public class PendingRaid {
 
     public List<RaidRole> getRolesWithNumbers() {
         return rolesWithNumbers;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

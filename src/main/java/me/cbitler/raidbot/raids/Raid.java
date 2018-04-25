@@ -11,7 +11,7 @@ import java.util.*;
  * Represents a raid and has methods for adding/removing users, user flex roles, etc
  */
 public class Raid {
-    String messageId, name, date,time, serverId, channelId, raidLeaderName;
+    String messageId, name, description, date,time, serverId, channelId, raidLeaderName;
     List<RaidRole> roles = new ArrayList<RaidRole>();
     HashMap<RaidUser, String> userToRole = new HashMap<RaidUser, String>();
     HashMap<RaidUser, List<FlexRole>> usersToFlexRoles = new HashMap<>();
@@ -26,12 +26,13 @@ public class Raid {
      * @param date The date of the raid
      * @param time The time of the raid
      */
-    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String date, String time) {
+    public Raid(String messageId, String serverId, String channelId, String raidLeaderName, String name, String description, String date, String time) {
         this.messageId = messageId;
         this.serverId = serverId;
         this.channelId = channelId;
         this.raidLeaderName = raidLeaderName;
         this.name = name;
+        this.description = description;
         this.date = date;
         this.time = time;
     }
@@ -64,6 +65,22 @@ public class Raid {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Get the description of the raid
+     * @return The description of the raid
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set the description of the raid
+     * @param description The description of the raid
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
@@ -325,6 +342,7 @@ public class Raid {
     private MessageEmbed buildEmbed() {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(getName());
+        builder.addField("Description:" , getDescription(), false);
         builder.addBlankField(false);
         if (getRaidLeaderName() != null) {
             builder.addField("Leader: ", "**" + getRaidLeaderName() + "**", false);
@@ -348,8 +366,10 @@ public class Raid {
     private String buildFlexRolesText() {
         String text = "";
         for (Map.Entry<RaidUser, List<FlexRole>> flex : usersToFlexRoles.entrySet()) {
-            for (FlexRole frole : flex.getValue()) {
-                text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+            if(flex.getKey() != null) {
+                for (FlexRole frole : flex.getValue()) {
+                    text += ("- " + flex.getKey().getName() + " (" + frole.spec + "/" + frole.role + ")\n");
+                }
             }
         }
 

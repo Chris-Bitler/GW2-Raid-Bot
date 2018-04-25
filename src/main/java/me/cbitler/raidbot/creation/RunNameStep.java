@@ -21,7 +21,7 @@ public class RunNameStep implements CreationStep {
     }
 
     /**
-     * Set the name of the raid and the server ID. Also create th raid if it doesn't exist
+     * Set the name of the raid and the server ID. Also create the raid if it doesn't exist
      * @param e The direct message event
      * @return True always
      */
@@ -51,6 +51,6 @@ public class RunNameStep implements CreationStep {
      * {@inheritDoc}
      */
     public CreationStep getNextStep() {
-        return new RunChannelStep();
+        return new RunDescriptionStep();
     }
 }

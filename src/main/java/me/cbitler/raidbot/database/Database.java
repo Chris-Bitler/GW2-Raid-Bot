@@ -19,6 +19,7 @@ public class Database {
             + " channelId text NOT NULL, \n"
             + " leader text NOT NULL, \n"
             + " `name` text NOT NULL, \n"
+            + " `description` text, \n"
             + " `date` text NOT NULL, \n"
             + " `time` text NOT NULL, \n"
             + " roles text NOT NULL);";
@@ -120,6 +121,7 @@ public class Database {
 
         try {
             connection.createStatement().execute("ALTER TABLE raids ADD COLUMN leader text");
+            connection.createStatement().execute("ALTER TABLE raids ADD COLUMN `description` text");
         } catch (Exception e) { }
     }
 }

@@ -1,6 +1,7 @@
 package me.cbitler.raidbot;
 
 import me.cbitler.raidbot.handlers.DMHandler;
+import me.cbitler.raidbot.utility.EnvVariables;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -33,8 +34,8 @@ public class Main {
      * @throws IOException
      */
     private static String readToken() throws IOException {
-        BufferedReader br = new BufferedReader(
-                new FileReader(new File("token")));
-        return br.readLine();
+        EnvVariables variables = new EnvVariables();
+        variables.loadFromEnvFile();
+        return variables.getValue("DISCORD_TOKEN");
     }
 }

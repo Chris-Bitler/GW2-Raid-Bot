@@ -37,7 +37,7 @@ public class RaidManager {
                 channels.get(0).sendMessage(message).queue(message1 -> {
                     boolean inserted = insertToDatabase(raid, message1.getId(), message1.getGuild().getId(), message1.getChannel().getId());
                     if (inserted) {
-                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDate(), raid.getTime());
+                        Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
 
@@ -71,17 +71,19 @@ public class RaidManager {
         String roles = formatRolesForDatabase(raid.getRolesWithNumbers());
 
         try {
-            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?)", new String[] {
+            db.update("INSERT INTO `raids` (`raidId`, `serverId`, `channelId`, `leader`, `name`, `description`, `date`, `time`, `roles`) VALUES (?,?,?,?,?,?,?,?,?)", new String[] {
                     messageId,
                     serverId,
                     channelId,
                     raid.getLeaderName(),
                     raid.getName(),
+                    raid.getDescription(),
                     raid.getDate(),
                     raid.getTime(),
                     roles
             });
         } catch (SQLException e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -102,6 +104,10 @@ public class RaidManager {
             QueryResult results = db.query("SELECT * FROM `raids`", new String[] {});
             while (results.getResults().next()) {
                 String name = results.getResults().getString("name");
+                String description = results.getResults().getString("description");
+                if(description == null) {
+                    description = "N/A";
+                }
                 String date = results.getResults().getString("date");
                 String time = results.getResults().getString("time");
                 String rolesText = results.getResults().getString("roles");
@@ -114,7 +120,7 @@ public class RaidManager {
                     leaderName = results.getResults().getString("leader");
                 } catch (Exception e) { }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, date, time);
+                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time);
                 String[] roleSplit = rolesText.split(";");
                 for(String roleAndAmount : roleSplit) {
                     String[] parts = roleAndAmount.split(":");
@@ -253,6 +259,7 @@ public class RaidManager {
     private static MessageEmbed buildEmbed(PendingRaid raid) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle(raid.getName());
+        builder.addField("Description:" , raid.getDescription(), false);
         builder.addBlankField(false);
         if (raid.getLeaderName() != null) {
             builder.addField("Leader: ", "**" + raid.getLeaderName() + "**", false);
