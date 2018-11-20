@@ -429,8 +429,10 @@ public class Raid {
     public int getUserNumFlexRoles(String id) {
         for (Map.Entry<RaidUser, List<FlexRole>> entry : usersToFlexRoles.entrySet()) {
             RaidUser user = entry.getKey();
-            if (user.id.equalsIgnoreCase(id)) {
-                return entry.getValue().size();
+            if (user != null && user.getId() != null) {
+                if (user.id.equalsIgnoreCase(id)) {
+                    return entry.getValue().size();
+                }
             }
         }
 
