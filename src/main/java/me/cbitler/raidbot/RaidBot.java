@@ -52,7 +52,7 @@ public class RaidBot {
         this.jda = jda;
         jda.addEventListener(new DMHandler(this), new ChannelMessageHandler(), new ReactionHandler());
         try {
-            db = new Database(Variables.getInstance().getStringProperty(DATABASE.toString()));
+            db = new Database(Variables.getINSTANCE().getStringProperty(DATABASE.toString()));
         } catch (IOException e) {
             e.printStackTrace();
         }

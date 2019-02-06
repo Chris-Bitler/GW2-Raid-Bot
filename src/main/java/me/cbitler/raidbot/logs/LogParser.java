@@ -115,7 +115,7 @@ public class LogParser implements Runnable {
                 e.printStackTrace();
             }
 
-            Variables variables = Variables.getInstance();
+            Variables variables = Variables.getINSTANCE();
             channel.sendMessage("dps.report done. Uploading to gw2raidar").queue();
             String tokenResponse =
                     this.handleCurl(new String[] {"curl", "-s", "-F", "username=" + variables.getStringProperty(RAIDAR_USERNAME.toString()), "-F", "password=" + variables.getStringProperty(RAIDAR_PASSWORD.toString()), "https://www.gw2raidar.com/api/v2/token"});

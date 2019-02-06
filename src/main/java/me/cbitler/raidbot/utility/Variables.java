@@ -10,7 +10,7 @@ import java.util.Properties;
  * @author MiniClem
  */
 public class Variables {
-	private static Variables instance;
+	private static Variables INSTANCE;
 	private static Properties properties;
 	private final static String PROPERTY_FILENAME = "configuration.properties";
 
@@ -19,12 +19,11 @@ public class Variables {
 		loadFromPropertyFile();
 	}
 
-	public static Variables getInstance() throws IOException {
-		if(properties != null){
-			return instance;
-		}else{
-			return new Variables();
-		}
+	public static Variables getINSTANCE() throws IOException {
+		if(INSTANCE == null) {
+			INSTANCE = new Variables();
+		}   
+		return INSTANCE;
 	}
 
 	private static void loadFromPropertyFile() throws IOException {

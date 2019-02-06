@@ -35,6 +35,6 @@ public class Main {
      * @throws IOException
      */
     private static String readToken() throws IOException {
-        return Variables.getInstance().getStringProperty(DISCORD_TOKEN.toString());
+        return Variables.getINSTANCE().getStringProperty(DISCORD_TOKEN.toString());
     }
 }
