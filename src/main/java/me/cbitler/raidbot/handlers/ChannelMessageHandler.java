@@ -5,6 +5,8 @@ import me.cbitler.raidbot.commands.Command;
 import me.cbitler.raidbot.commands.CommandRegistry;
 import me.cbitler.raidbot.creation.CreationStep;
 import me.cbitler.raidbot.creation.RunNameStep;
+import me.cbitler.raidbot.edit.EditStep;
+import me.cbitler.raidbot.edit.EditIdleStep;
 import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
@@ -21,6 +23,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 /**
  * Handle channel message-related events sent to the bot
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class ChannelMessageHandler extends ListenerAdapter {
 
@@ -77,6 +80,38 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 try {
                     e.getMessage().delete().queue();
                 } catch (Exception exception) {}
+            } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!editraid")) {
+            	String[] split = e.getMessage().getRawContent().split(" ");
+                if(split.length < 2) {
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Format for !editRaid: !editRaid [raid id]").queue());
+                } else {
+                    String messageId = split[1];
+
+                    Raid raid = RaidManager.getRaid(messageId);
+
+                    if (raid != null && raid.getServerId().equalsIgnoreCase(e.getGuild().getId())) {
+                        // check if this user is already editing or creating, or the raid is being edited by someone else
+                    	if (bot.getCreationMap().get(e.getAuthor().getId()) != null) {
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You cannot edit a raid while creating.").queue());                   			
+                    	} else if (bot.getEditMap().get(e.getAuthor().getId()) != null) {
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("You can only edit one raid at a time.").queue());                   			
+                    	} else if (bot.getEditList().contains(messageId)) {
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("The selected raid is already being edited.").queue());                   			
+                    	} else {
+                    		// start editing process
+                    		EditStep editIdleStep = new EditIdleStep(messageId);
+                    		e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(editIdleStep.getStepText()).queue());
+                    		bot.getEditMap().put(e.getAuthor().getId(), editIdleStep);
+                    		bot.getEditList().add(messageId);
+                    	}
+                    } else {
+                        e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Non-existant raid").queue());
+                    }
+                }
+                try {
+                    e.getMessage().delete().queue();
+                } catch (Exception exception) {}
+            	
             }
         }
 

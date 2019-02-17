@@ -26,7 +26,7 @@ public class RunRoleSetupStep implements CreationStep {
             if(raid.getRolesWithNumbers().size() > 0) {
                 return true;
             } else {
-                e.getChannel().sendMessage("You must add atleast one role.").queue();
+                e.getChannel().sendMessage("You must add at least one role.").queue();
                 return false;
             }
         } else {

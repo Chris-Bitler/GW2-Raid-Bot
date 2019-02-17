@@ -2,6 +2,7 @@ package me.cbitler.raidbot.handlers;
 
 import me.cbitler.raidbot.RaidBot;
 import me.cbitler.raidbot.creation.CreationStep;
+import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.logs.LogParser;
 import me.cbitler.raidbot.raids.PendingRaid;
 import me.cbitler.raidbot.raids.RaidManager;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 /**
  * Handle direct messages sent to the bot
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class DMHandler extends ListenerAdapter {
     RaidBot bot;
@@ -91,6 +93,22 @@ public class DMHandler extends ListenerAdapter {
                 }
             }
 
+        } else if (bot.getEditMap().containsKey(author.getId())) {
+            EditStep step = bot.getEditMap().get(author.getId());
+            boolean done = step.handleDM(e);
+
+            // If this step is done, move onto the next one or finish
+            if (done) {
+                EditStep nextStep = step.getNextStep();
+                if(nextStep != null) {
+                    bot.getEditMap().put(author.getId(), nextStep);
+                    e.getChannel().sendMessage(nextStep.getStepText()).queue();
+                } else {
+                    //Create raid
+                    bot.getEditMap().remove(author.getId());
+                    e.getChannel().sendMessage("Finished editing raid").queue();
+                }
+            }
         }
 
         if(e.getMessage().getAttachments().size() > 0 && e.getChannelType() == ChannelType.PRIVATE) {

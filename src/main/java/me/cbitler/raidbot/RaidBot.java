@@ -2,6 +2,7 @@ package me.cbitler.raidbot;
 
 import me.cbitler.raidbot.commands.*;
 import me.cbitler.raidbot.creation.CreationStep;
+import me.cbitler.raidbot.edit.EditStep;
 import me.cbitler.raidbot.database.Database;
 import me.cbitler.raidbot.database.QueryResult;
 import me.cbitler.raidbot.handlers.ChannelMessageHandler;
@@ -18,6 +19,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Class representing the raid bot itself.
@@ -26,14 +28,18 @@ import java.util.HashMap;
  * for other classes to access it.
  *
  * @author Christopher Bitler
+ * @author Franziska Mueller
  */
 public class RaidBot {
     private static RaidBot instance;
     private JDA jda;
 
     HashMap<String, CreationStep> creation = new HashMap<String, CreationStep>();
+    HashMap<String, EditStep> edits = new HashMap<String, EditStep>();
     HashMap<String, PendingRaid> pendingRaids = new HashMap<String, PendingRaid>();
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
+    
+    Set<String> editList;
 
     //TODO: This should be moved to it's own settings thing
     HashMap<String, String> raidLeaderRoleCache = new HashMap<>();
@@ -52,7 +58,7 @@ public class RaidBot {
         db = new Database("raid.db");
         db.connect();
         RaidManager.loadRaids();
-
+        
         CommandRegistry.addCommand("help", new HelpCommand());
         CommandRegistry.addCommand("info", new InfoCommand());
         CommandRegistry.addCommand("endRaid", new EndRaidCommand());
@@ -80,6 +86,14 @@ public class RaidBot {
     public HashMap<String, CreationStep> getCreationMap() {
         return creation;
     }
+    
+    /**
+     * Map of UserId -> edit step for raids in the edit process
+     * @return The map of UserId -> edit step for raids in the edit process
+     */
+    public HashMap<String, EditStep> getEditMap() {
+        return edits;
+    }
 
     /**
      * Map of the UserId -> roleSelection step for people in the role selection process
@@ -95,6 +109,14 @@ public class RaidBot {
      */
     public HashMap<String, PendingRaid> getPendingRaids() {
         return pendingRaids;
+    }
+    
+    /**
+     * List of messageIDs for raids in the edit process
+     * @return List of messageIDs for raids in the edit process
+     */
+    public Set<String> getEditList() {
+        return editList;
     }
 
     /**

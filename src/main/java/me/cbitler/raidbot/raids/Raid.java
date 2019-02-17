@@ -98,6 +98,28 @@ public class Raid {
     public String getTime() {
         return time;
     }
+    
+    /**
+     * Set the time of the raid
+     * @param time The time of the raid
+     */
+    public void setTime(String time) {
+        this.time = time;
+    }
+    
+    /**
+     * Updates the time of the raid in the database
+     */
+    public boolean updateTimeDB() {
+    	try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `time`=? WHERE `raidId`=?", 
+            		new String[] { time, messageId });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    	return true;
+    }
 
     /**
      * Get the raid leader's name
