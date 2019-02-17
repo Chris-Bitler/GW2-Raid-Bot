@@ -26,12 +26,17 @@ public class EditIdleStep implements EditStep {
         boolean valid = true;
     	if (e.getMessage().getRawContent().equalsIgnoreCase("time")) {
         	m_nextStep = new EditTimeStep(m_messageID);
-        	
+        } else if (e.getMessage().getRawContent().equalsIgnoreCase("date")) {
+        	m_nextStep = new EditDateStep(m_messageID);
+        } else if (e.getMessage().getRawContent().equalsIgnoreCase("name")) {
+        	m_nextStep = new EditNameStep(m_messageID);
+        } else if (e.getMessage().getRawContent().equalsIgnoreCase("description")) {
+        	m_nextStep = new EditDescriptionStep(m_messageID);
         } else if(e.getMessage().getRawContent().equalsIgnoreCase("done")) {
             m_nextStep = null;
         }
         else {
-        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid property. Supported properties: time.").queue());
+        	e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Invalid property. Supported properties: time, date, name, description.").queue());
         	valid = false;
         }
     	return valid;
@@ -41,7 +46,7 @@ public class EditIdleStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the name of the property you want to change [time] or done when you want to finish editing.";
+        return "Enter the name of the property you want to change [time, date, name, description] or done when you want to finish editing.";
     }
 
     /**

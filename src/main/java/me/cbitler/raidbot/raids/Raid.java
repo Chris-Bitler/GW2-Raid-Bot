@@ -66,6 +66,28 @@ public class Raid {
     public String getName() {
         return name;
     }
+    
+    /**
+     * Set the name of the raid
+     * @param name The name of the raid
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    /**
+     * Updates the name of the raid in the database
+     */
+    public boolean updateNameDB() {
+    	try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `name`=? WHERE `raidId`=?", 
+            		new String[] { name, messageId });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    	return true;
+    }
 
     /**
      * Get the description of the raid
@@ -82,6 +104,20 @@ public class Raid {
     public void setDescription(String description) {
         this.description = description;
     }
+    
+    /**
+     * Updates the description of the raid in the database
+     */
+    public boolean updateDescriptionDB() {
+    	try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `description`=? WHERE `raidId`=?", 
+            		new String[] { description, messageId });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    	return true;
+    }
 
     /**
      * Get the date of this raid
@@ -89,6 +125,28 @@ public class Raid {
      */
     public String getDate() {
         return date;
+    }
+    
+    /**
+     * Set the date of the raid
+     * @param date The date of the raid
+     */
+    public void setDate(String date) {
+        this.date = date;
+    }
+    
+    /**
+     * Updates the date of the raid in the database
+     */
+    public boolean updateDateDB() {
+    	try {
+            RaidBot.getInstance().getDatabase().update("UPDATE `raids` SET `date`=? WHERE `raidId`=?", 
+            		new String[] { date, messageId });
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    	return true;
     }
 
     /**

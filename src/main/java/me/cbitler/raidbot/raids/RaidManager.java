@@ -42,6 +42,7 @@ public class RaidManager {
                         raids.add(newRaid);
 
                         for (Emote emote : Reactions.getEmotes()) {
+                        	//System.out.println("emote!");
                             message1.addReaction(emote).queue();
                         }
                     } else {

@@ -108,7 +108,7 @@ public class DMHandler extends ListenerAdapter {
                     // finish editing
                     bot.getEditMap().remove(author.getId());
                     bot.getEditList().remove(messageId);
-                    e.getChannel().sendMessage("Finished editing raid").queue();
+                    e.getChannel().sendMessage("Finished editing raid.").queue();
                 }
             }
         }
