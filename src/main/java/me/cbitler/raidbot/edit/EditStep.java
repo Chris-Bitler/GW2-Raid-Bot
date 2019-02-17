@@ -16,6 +16,12 @@ public interface EditStep {
     boolean handleDM(PrivateMessageReceivedEvent e);
 
     /**
+     * Get the messageID of the raid being edited.
+     * @return the messageID of the raid being edited
+     */
+    String getMessageID();
+    
+    /**
      * Get the next step. Should create a new object representing the next step and return it.
      * @return The object representing the next  step
      */

@@ -19,6 +19,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -39,7 +40,7 @@ public class RaidBot {
     HashMap<String, PendingRaid> pendingRaids = new HashMap<String, PendingRaid>();
     HashMap<String, SelectionStep> roleSelection = new HashMap<String, SelectionStep>();
     
-    Set<String> editList;
+    Set<String> editList = new HashSet<String>();
 
     //TODO: This should be moved to it's own settings thing
     HashMap<String, String> raidLeaderRoleCache = new HashMap<>();

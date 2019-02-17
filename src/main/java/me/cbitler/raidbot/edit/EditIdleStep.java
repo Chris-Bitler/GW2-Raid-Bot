@@ -41,7 +41,7 @@ public class EditIdleStep implements EditStep {
      * {@inheritDoc}
      */
     public String getStepText() {
-        return "Enter the name of the property you want to change: [time]";
+        return "Enter the name of the property you want to change [time] or done when you want to finish editing.";
     }
 
     /**
@@ -50,4 +50,9 @@ public class EditIdleStep implements EditStep {
     public EditStep getNextStep() {
         return m_nextStep;
     }
+
+	@Override
+	public String getMessageID() {
+		return m_messageID;
+	}
 }

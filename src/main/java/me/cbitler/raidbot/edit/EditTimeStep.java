@@ -49,4 +49,9 @@ public class EditTimeStep implements EditStep {
     public EditStep getNextStep() {
         return new EditIdleStep(m_messageID);
     }
+
+	@Override
+	public String getMessageID() {
+		return m_messageID;
+	}
 }

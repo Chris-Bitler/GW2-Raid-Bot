@@ -96,6 +96,7 @@ public class DMHandler extends ListenerAdapter {
         } else if (bot.getEditMap().containsKey(author.getId())) {
             EditStep step = bot.getEditMap().get(author.getId());
             boolean done = step.handleDM(e);
+            String messageId = step.getMessageID();
 
             // If this step is done, move onto the next one or finish
             if (done) {
@@ -104,8 +105,9 @@ public class DMHandler extends ListenerAdapter {
                     bot.getEditMap().put(author.getId(), nextStep);
                     e.getChannel().sendMessage(nextStep.getStepText()).queue();
                 } else {
-                    //Create raid
+                    // finish editing
                     bot.getEditMap().remove(author.getId());
+                    bot.getEditList().remove(messageId);
                     e.getChannel().sendMessage("Finished editing raid").queue();
                 }
             }
