@@ -40,6 +40,7 @@ public class RaidManager {
                         Raid newRaid = new Raid(message1.getId(), message1.getGuild().getId(), message1.getChannel().getId(), raid.getLeaderName(), raid.getName(), raid.getDescription(), raid.getDate(), raid.getTime());
                         newRaid.roles.addAll(raid.rolesWithNumbers);
                         raids.add(newRaid);
+                        newRaid.updateMessage();
 
                         for (Emote emote : Reactions.getEmotes()) {
                         	//System.out.println("emote!");
@@ -56,7 +57,6 @@ public class RaidManager {
             }
         }
     }
-
     /**
      * Insert a raid into the database
      * @param raid The raid to insert
