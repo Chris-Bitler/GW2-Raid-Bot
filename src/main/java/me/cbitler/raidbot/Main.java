@@ -32,10 +32,10 @@ public class Main {
      * Read the token from the token file
      * @return The token text
      * @throws IOException
-     */
+     */    
     private static String readToken() throws IOException {
-        EnvVariables variables = new EnvVariables();
-        variables.loadFromEnvFile();
-        return variables.getValue("DISCORD_TOKEN");
+        BufferedReader br = new BufferedReader(
+                new FileReader(new File("token")));
+        return br.readLine();
     }
 }

@@ -1,0 +1,4 @@
+- list (current count/total count) per role
+- X reaction: send private message to ask which role to delete (or all)
+- core classes -> requires new icons
+- update raid message once at the beginning s.t. messageID is displayed directly

@@ -69,7 +69,7 @@ public class GuildCountUtil {
      */
     private static String readToken() throws IOException {
         BufferedReader br = new BufferedReader(
-                new FileReader(new File("discord_bots_token")));
+                new FileReader(new File("token")));
         return br.readLine();
     }
 }
