@@ -120,15 +120,19 @@ public class RaidManager {
                     leaderName = results.getResults().getString("leader");
                 } catch (Exception e) { }
 
-                Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time);
-                String[] roleSplit = rolesText.split(";");
-                for(String roleAndAmount : roleSplit) {
-                    String[] parts = roleAndAmount.split(":");
-                    int amnt = Integer.parseInt(parts[0]);
-                    String role = parts[1];
-                    raid.roles.add(new RaidRole(amnt, role));
+                try {
+                    Raid raid = new Raid(messageId, serverId, channelId, leaderName, name, description, date, time);
+                    String[] roleSplit = rolesText.split(";");
+                    for (String roleAndAmount : roleSplit) {
+                        String[] parts = roleAndAmount.split(":");
+                        int amnt = Integer.parseInt(parts[0]);
+                        String role = parts[1];
+                        raid.roles.add(new RaidRole(amnt, role));
+                    }
+                    raids.add(raid);
+                } catch (Exception e) {
+                    System.out.println("Raid couldn't load: " + e.getMessage());
                 }
-                raids.add(raid);
             }
             results.getResults().close();
             results.getStmt().close();
@@ -185,6 +189,7 @@ public class RaidManager {
                 RaidBot.getInstance().getServer(r.getServerId())
                         .getTextChannelById(r.getChannelId()).getMessageById(messageId).queue(message -> message.delete().queue());
             } catch (Exception e) {
+                System.out.println("Tried to delete raid without message");
                 // Nothing, the message doesn't exist - it can happen
             }
 

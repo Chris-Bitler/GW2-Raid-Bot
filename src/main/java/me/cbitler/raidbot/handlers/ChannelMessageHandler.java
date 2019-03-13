@@ -46,16 +46,22 @@ public class ChannelMessageHandler extends ListenerAdapter {
 
                 try {
                     e.getMessage().delete().queue();
-                } catch (Exception exception) {}
+                } catch (Exception exception) {
+                    e.getMember().getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Make sure that the bot has the 'Manage message' permission").queue());
+                }
             }
         }
 
         if (PermissionsUtil.hasRaidLeaderRole(e.getMember())) {
             if (e.getMessage().getRawContent().equalsIgnoreCase("!createRaid")) {
-                CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
-                bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
-                e.getMessage().delete().queue();
+                try {
+                    CreationStep runNameStep = new RunNameStep(e.getMessage().getGuild().getId());
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage(runNameStep.getStepText()).queue());
+                    bot.getCreationMap().put(e.getAuthor().getId(), runNameStep);
+                    e.getMessage().delete().queue();
+                } catch (Exception exc) {
+                    e.getMember().getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Make sure that the bot has the 'Manage messages' permission").queue());
+                }
             } else if (e.getMessage().getRawContent().toLowerCase().startsWith("!removefromraid")) {
                 String[] split = e.getMessage().getRawContent().split(" ");
                 if(split.length < 3) {
@@ -76,17 +82,23 @@ public class ChannelMessageHandler extends ListenerAdapter {
                 }
                 try {
                     e.getMessage().delete().queue();
-                } catch (Exception exception) {}
+                } catch (Exception exception) {
+                    e.getMember().getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Make sure that the bot has the 'Manage messages' permission").queue());
+                }
             }
         }
 
         if (e.getMember().getPermissions().contains(Permission.MANAGE_SERVER)) {
             if(e.getMessage().getRawContent().toLowerCase().startsWith("!setraidleaderrole")) {
-                String[] commandParts = e.getMessage().getRawContent().split(" ");
-                String raidLeaderRole = combineArguments(commandParts,1);
-                RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
-                e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid leader role updated to: " + raidLeaderRole).queue());
-                e.getMessage().delete().queue();
+                try {
+                    String[] commandParts = e.getMessage().getRawContent().split(" ");
+                    String raidLeaderRole = combineArguments(commandParts, 1);
+                    RaidBot.getInstance().setRaidLeaderRole(e.getMember().getGuild().getId(), raidLeaderRole);
+                    e.getAuthor().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Raid leader role updated to: " + raidLeaderRole).queue());
+                    e.getMessage().delete().queue();
+                } catch (Exception exc) {
+                    e.getMember().getUser().openPrivateChannel().queue(privateChannel -> privateChannel.sendMessage("Make sure that the bot has the 'Manage messages' permission").queue());
+                }
             }
         }
     }

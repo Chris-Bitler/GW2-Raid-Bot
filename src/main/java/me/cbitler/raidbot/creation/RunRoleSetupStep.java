@@ -36,7 +36,7 @@ public class RunRoleSetupStep implements CreationStep {
             } else {
                 try {
                     int amnt = Integer.parseInt(parts[0]);
-                    String roleName = parts[1];
+                    String roleName = parts[1].trim();
                     raid.getRolesWithNumbers().add(new RaidRole(amnt, roleName));
                     e.getChannel().sendMessage("Role added").queue();
                 } catch (Exception ex) {
