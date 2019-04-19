@@ -8,16 +8,18 @@ import me.cbitler.raidbot.handlers.ChannelMessageHandler;
 import me.cbitler.raidbot.handlers.DMHandler;
 import me.cbitler.raidbot.handlers.ReactionHandler;
 import me.cbitler.raidbot.raids.PendingRaid;
-import me.cbitler.raidbot.raids.Raid;
 import me.cbitler.raidbot.raids.RaidManager;
 import me.cbitler.raidbot.selection.SelectionStep;
 import me.cbitler.raidbot.utility.GuildCountUtil;
+import me.cbitler.raidbot.utility.Variables;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
+
+import static me.cbitler.raidbot.utility.Variables.RaidBotProperty.DATABASE;
 
 /**
  * Class representing the raid bot itself.
@@ -49,7 +51,11 @@ public class RaidBot {
 
         this.jda = jda;
         jda.addEventListener(new DMHandler(this), new ChannelMessageHandler(), new ReactionHandler());
-        db = new Database("raid.db");
+        try {
+            db = new Database(Variables.getINSTANCE().getStringProperty(DATABASE.toString()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         db.connect();
         RaidManager.loadRaids();
 

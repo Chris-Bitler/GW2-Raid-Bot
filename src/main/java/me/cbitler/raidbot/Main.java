@@ -1,14 +1,15 @@
 package me.cbitler.raidbot;
 
-import me.cbitler.raidbot.handlers.DMHandler;
-import me.cbitler.raidbot.utility.EnvVariables;
+import me.cbitler.raidbot.utility.Variables;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 
 import javax.security.auth.login.LoginException;
-import java.io.*;
+import java.io.IOException;
+
+import static me.cbitler.raidbot.utility.Variables.RaidBotProperty.DISCORD_TOKEN;
 
 /**
  * Start the program, read the token, and start the bot
@@ -34,8 +35,6 @@ public class Main {
      * @throws IOException
      */
     private static String readToken() throws IOException {
-        EnvVariables variables = new EnvVariables();
-        variables.loadFromEnvFile();
-        return variables.getValue("DISCORD_TOKEN");
+        return Variables.getINSTANCE().getStringProperty(DISCORD_TOKEN.toString());
     }
 }

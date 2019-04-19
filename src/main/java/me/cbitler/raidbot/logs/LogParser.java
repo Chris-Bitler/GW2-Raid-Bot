@@ -1,6 +1,6 @@
 package me.cbitler.raidbot.logs;
 
-import me.cbitler.raidbot.utility.EnvVariables;
+import me.cbitler.raidbot.utility.Variables;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import org.apache.commons.io.IOUtils;
@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+
+import static me.cbitler.raidbot.utility.Variables.RaidBotProperty.RAIDAR_PASSWORD;
+import static me.cbitler.raidbot.utility.Variables.RaidBotProperty.RAIDAR_USERNAME;
 
 /**
  * Upload log files sent to the bot to a local parser, dps.report, and GW2 Raidar
@@ -112,11 +115,10 @@ public class LogParser implements Runnable {
                 e.printStackTrace();
             }
 
-            EnvVariables variables = new EnvVariables();
-            variables.loadFromEnvFile();
+            Variables variables = Variables.getINSTANCE();
             channel.sendMessage("dps.report done. Uploading to gw2raidar").queue();
             String tokenResponse =
-                    this.handleCurl(new String[] {"curl", "-s", "-F", "username=" + variables.getValue("RAIDAR_USERNAME"), "-F", "password=" + variables.getValue("RAIDAR_PASSWORD"), "https://www.gw2raidar.com/api/v2/token"});
+                    this.handleCurl(new String[] {"curl", "-s", "-F", "username=" + variables.getStringProperty(RAIDAR_USERNAME.toString()), "-F", "password=" + variables.getStringProperty(RAIDAR_PASSWORD.toString()), "https://www.gw2raidar.com/api/v2/token"});
             System.out.println(tokenResponse);
             JSONObject token =
                     (JSONObject) parser.parse(tokenResponse);
